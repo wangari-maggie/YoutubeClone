@@ -511,6 +511,10 @@
                     <p>${video.views} • ${video.uploaded || "Just now"}</p>
                   </div>
                 </div>`;
+
+                div.addEventListener("click", () => {
+                  window.location.href = `./pages/watch.html?v=${video.id}`;
+                });
               } else {
                 div.classList.add("short");
                 div.innerHTML = `

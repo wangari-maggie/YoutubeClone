@@ -36,4 +36,17 @@ router.get("/shorts", async (req, res) => {
   res.json(rows);
 });
 
+// Single video by ID
+router.get("/video/:id", async (req, res) => {
+  const [rows] = await mockDb.query("SELECT * FROM videos WHERE id = ?", [
+    req.params.id,
+  ]);
+
+  if (!rows.length) {
+    return res.status(404).json({ message: "Video not found" });
+  }
+
+  res.json(rows[0]);
+});
+
 module.exports = router;

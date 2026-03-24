@@ -1,92 +1,130 @@
-const mockVideo = {
-  id: 1,
-  title: "Building a Game Engine with Vulkan",
-  views: "12,431 views",
-  uploaded: "Feb 1, 2026",
-  channel: "SolsticeMara",
-  subscribers: "3.2K subscribers",
-  description: `
-In this video we walk through the architectural decisions behind building
-a Vulkan-based game engine from scratch.
+const API_BASE = "http://localhost:3000/api/mock";
 
-Topics covered:
-- Vulkan mindset
-- ECS design
-- Engine tooling
-  `,
-  videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+const getVideoIdFromQuery = () => {
+  const params = new URLSearchParams(window.location.search);
+  return Number(params.get("v")) || 1;
 };
 
-const mockComments = [
+const buildComments = (video) => [
   {
-    author: "DevStudent",
-    text: "This actually explains Vulkan better than most tutorials.",
-  },
-  { author: "GraphicsNerd", text: "That ECS explanation was clean." },
-  { author: "Beginner123", text: "Can you do a follow-up on render graphs?" },
-];
-
-const recommendedVideos = [
-  {
-    id: 2,
-    title: "Why Vulkan Forces Better Architecture",
-    channel: "Low Level Graphics",
-    thumbnail: "https://picsum.photos/320/180?random=10",
+    author: "MyTube Viewer",
+    text: `Great upload from ${video.channel}.`,
   },
   {
-    id: 3,
-    title: "Understanding ECS Properly",
-    channel: "Engine Talk",
-    thumbnail: "https://picsum.photos/320/180?random=11",
+    author: "CodeFan",
+    text: `This part about \"${video.title}\" was super useful.`,
+  },
+  {
+    author: "LearningDaily",
+    text: "Please post more videos like this!",
   },
 ];
 
-// Render main video
-document.getElementById("video-player").innerHTML = `
-  <iframe src="${mockVideo.videoUrl}" allowfullscreen></iframe>
-`;
-
-document.getElementById("video-title").textContent = mockVideo.title;
-document.getElementById("video-views").textContent = mockVideo.views;
-document.getElementById("video-date").textContent = ` • ${mockVideo.uploaded}`;
-document.getElementById("channel-name").textContent = mockVideo.channel;
-document.getElementById("subscriber-count").textContent = mockVideo.subscribers;
-document.getElementById("video-description").textContent =
-  mockVideo.description;
-
-// Render comments
-const commentsContainer = document.getElementById("comments");
-
-mockComments.forEach((c) => {
-  const div = document.createElement("div");
-  div.className = "comment";
-  div.innerHTML = `
-    <div class="comment-author">${c.author}</div>
-    <div class="comment-text">${c.text}</div>
-  `;
-  commentsContainer.appendChild(div);
-});
-
-// Render recommended videos
-const recContainer = document.getElementById("recommended-videos");
-
-recommendedVideos.forEach((v) => {
-  const card = document.createElement("div");
-  card.className = "recommend-card";
-  card.innerHTML = `
-    <div class="recommend-thumb">
-      <img src="${v.thumbnail}" />
-    </div>
-    <div class="recommend-info">
-      <h5>${v.title}</h5>
-      <p>${v.channel}</p>
-    </div>
+const renderVideo = (video) => {
+  document.getElementById("video-player").innerHTML = `
+    <iframe
+      src="${video.videoUrl}"
+      title="${video.title}"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+    ></iframe>
   `;
 
-  card.addEventListener("click", () => {
-    console.log("Navigate to video:", v.id);
-    // window.location.href = `/watch.html?v=${v.id}`;
+  document.getElementById("video-title").textContent = video.title;
+  document.getElementById("video-views").textContent = `${video.views} views`;
+  document.getElementById("video-date").textContent =
+    ` • ${video.uploaded || "Just now"}`;
+  document.getElementById("channel-name").textContent = video.channel;
+  document.getElementById("subscriber-count").textContent = "1.2M subscribers";
+  document.getElementById("video-description").textContent =
+    video.description || "No description provided.";
+};
+
+const renderComments = (video) => {
+  const commentsContainer = document.getElementById("comments");
+  commentsContainer.innerHTML = "";
+
+  buildComments(video).forEach((comment) => {
+    const div = document.createElement("div");
+    div.className = "comment";
+    div.innerHTML = `
+      <div class="comment-author">${comment.author}</div>
+      <div class="comment-text">${comment.text}</div>
+    `;
+    commentsContainer.appendChild(div);
   });
+};
 
-  recContainer.appendChild(card);
-});
+const renderRecommended = (videos, currentVideoId) => {
+  const recContainer = document.getElementById("recommended-videos");
+  recContainer.innerHTML = "";
+
+  videos
+    .filter((video) => video.id !== currentVideoId && video.type === "video")
+    .slice(0, 8)
+    .forEach((video) => {
+      const card = document.createElement("div");
+      card.className = "recommend-card";
+      card.innerHTML = `
+        <div class="recommend-thumb">
+          <img src="${video.thumbnail}" alt="${video.title}" />
+        </div>
+        <div class="recommend-info">
+          <h5>${video.title}</h5>
+          <p>${video.channel}</p>
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        window.location.href = `./watch.html?v=${video.id}`;
+      });
+
+      recContainer.appendChild(card);
+    });
+};
+
+const renderNotFound = () => {
+  document.getElementById("video-player").innerHTML =
+    '<div style="padding:16px;">Video not found.</div>';
+  document.getElementById("video-title").textContent = "Video not found";
+  document.getElementById("video-views").textContent = "";
+  document.getElementById("video-date").textContent = "";
+  document.getElementById("channel-name").textContent = "";
+  document.getElementById("subscriber-count").textContent = "";
+  document.getElementById("video-description").textContent =
+    "Try opening another video from the home page.";
+  document.getElementById("comments").innerHTML = "";
+  document.getElementById("recommended-videos").innerHTML = "";
+};
+
+const initWatchPage = async () => {
+  const selectedVideoId = getVideoIdFromQuery();
+
+  try {
+    const [videoResponse, recommendationsResponse] = await Promise.all([
+      fetch(`${API_BASE}/video/${selectedVideoId}`),
+      fetch(`${API_BASE}/home`),
+    ]);
+
+    if (!videoResponse.ok) {
+      renderNotFound();
+      return;
+    }
+
+    const selectedVideo = await videoResponse.json();
+    const recommendedVideos = recommendationsResponse.ok
+      ? await recommendationsResponse.json()
+      : [];
+
+    renderVideo(selectedVideo);
+    renderComments(selectedVideo);
+    renderRecommended(recommendedVideos, selectedVideo.id);
+  } catch (error) {
+    console.error("Failed to load watch page data:", error);
+    renderNotFound();
+  }
+};
+
+initWatchPage();
