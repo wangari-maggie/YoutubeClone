@@ -2,20 +2,345 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Watch | MyTube</title>
+    <title>Watch | VibeStream</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../styles.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+        background: #f9f9f9;
+        color: #030303;
+      }
+
+      /* Header */
+      .top-nav {
+        background: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      }
+
+      .nav-left, .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .menu-btn, .logo {
+        font-size: 18px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .nav-center {
+        flex: 1;
+        display: flex;
+        max-width: 400px;
+        margin: 0 16px;
+      }
+
+      .nav-center input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        font-size: 14px;
+      }
+
+      .nav-center button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-left: 12px;
+        font-size: 18px;
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #ff0080;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      /* Main Layout */
+      .watch-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 24px;
+        padding: 24px;
+        max-width: 1560px;
+        margin: 0 auto;
+      }
+
+      /* Video Player */
+      .video-player {
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      /* Video Info */
+      .watch-title {
+        font-size: 24px;
+        font-weight: 500;
+        margin: 24px 0 12px 0;
+        line-height: 1.4;
+      }
+
+      .watch-stats {
+        color: #606060;
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+
+      /* Channel Row */
+      .channel-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-top: 1px solid #e0e0e0;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 24px;
+      }
+
+      .channel-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .channel-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #ccc;
+      }
+
+      .channel-name {
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .subscriber-count {
+        color: #606060;
+        font-size: 12px;
+        margin-top: 2px;
+      }
+
+      .subscribe-btn {
+        background: #ff0080;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .subscribe-btn:hover {
+        background: #ff3399;
+        box-shadow: 0 2px 8px rgba(255, 0, 128, 0.3);
+      }
+
+      .subscribe-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      /* Action Buttons */
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border: 1px solid #e0e0e0;
+        background: #f9f9f9;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      .action-btn:hover {
+        background: #f0f0f0;
+      }
+
+      .action-btn.liked {
+        color: #ff0000;
+        border-color: #ff0000;
+        background: rgba(255, 0, 0, 0.05);
+      }
+
+      /* Description */
+      .video-description {
+        color: #030303;
+        font-size: 14px;
+        line-height: 1.6;
+        background: #f9f9f9;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        max-height: 100px;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .video-description.expanded {
+        max-height: none;
+      }
+
+      /* Comments */
+      .comments-section {
+        margin-top: 32px;
+      }
+
+      .comments-section h3 {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 20px;
+      }
+
+      .comment {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #ccc;
+        flex-shrink: 0;
+      }
+
+      .comment-author {
+        font-weight: 500;
+        font-size: 14px;
+      }
+
+      .comment-text {
+        color: #030303;
+        font-size: 14px;
+        margin-top: 4px;
+        word-break: break-word;
+      }
+
+      /* Sidebar */
+      .watch-sidebar {
+        height: fit-content;
+      }
+
+      .watch-sidebar h4 {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+
+      .recommend-card {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        padding: 8px;
+        border-radius: 8px;
+      }
+
+      .recommend-card:hover {
+        background: #f0f0f0;
+      }
+
+      .recommend-thumb {
+        flex-shrink: 0;
+        width: 120px;
+        overflow: hidden;
+        border-radius: 6px;
+      }
+
+      .recommend-thumb img {
+        width: 100%;
+        height: 67px;
+        object-fit: cover;
+      }
+
+      .recommend-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .recommend-info h5 {
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.3;
+        margin-bottom: 4px;
+        color: #030303;
+      }
+
+      .recommend-info p {
+        font-size: 12px;
+        color: #606060;
+        margin: 0;
+      }
+
+      /* Responsive */
+      @media (max-width: 880px) {
+        .watch-layout {
+          grid-template-columns: 1fr;
+          gap: 16px;
+          padding: 16px;
+        }
+
+        .watch-title {
+          font-size: 20px;
+        }
+
+        .watch-sidebar {
+          order: -1;
+        }
+      }
+    </style>
   </head>
   <body>
-    <!-- Top Nav (same as homepage) -->
+    <!-- Top Nav -->
     <header class="top-nav">
       <div class="nav-left">
         <div class="menu-btn">☰</div>
-        <div class="logo">MyTube</div>
+        <div class="logo">VibeStream</div>
       </div>
 
       <div class="nav-center">
-        <input type="text" placeholder="Search" />
+        <input type="text" placeholder="Search videos, creators..." />
         <button>🔍</button>
       </div>
 
@@ -48,6 +373,25 @@
           </div>
 
           <button class="subscribe-btn">Subscribe</button>
+        </div>
+
+        <div class="action-buttons">
+          <button class="action-btn" data-action="like" title="Like this video">
+            <span>👍</span>
+            <span>Like</span>
+          </button>
+          <button class="action-btn" data-action="dislike" title="Dislike this video">
+            <span>👎</span>
+            <span>Dislike</span>
+          </button>
+          <button class="action-btn" data-action="share" title="Share this video">
+            <span>🔗</span>
+            <span>Share</span>
+          </button>
+          <button class="action-btn" data-action="save" title="Save to playlist">
+            <span>💾</span>
+            <span>Save</span>
+          </button>
         </div>
 
         <div id="video-description" class="video-description"></div>
