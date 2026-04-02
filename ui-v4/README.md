@@ -3,7 +3,10 @@
 A modern, vibrant video platform UI with gradient aesthetics, built with vanilla JavaScript, CSS3, and HTML5. Features a hero section, horizontal tab navigation, and smooth animations.
 
 ## Group Members
-
+1. Briton Musembi
+2. John Hunja
+3. Dianah Mwendia
+4. Suheila Mohamed
 
 ## Key Features
 
