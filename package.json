@@ -1,9 +1,12 @@
 {
-  "name": "YoutubeClone",
+  "name": "youtubeclone",
   "version": "1.0.0",
   "description": "Youtube clone",
   "main": "app.js",
-  "repository": "https://github.com/lewis-2000/YoutubeClone",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lewis-2000/YoutubeClone.git"
+  },
   "author": "Lewis nganga",
   "license": "MIT",
   "private": false,
@@ -14,6 +17,15 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "multer": "^2.0.2",
-    "mysql2": "^3.16.3"
+    "mysql2": "^3.20.0"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lewis-2000/YoutubeClone/issues"
+  },
+  "homepage": "https://github.com/lewis-2000/YoutubeClone#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
